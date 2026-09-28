@@ -5,7 +5,7 @@
 #include <system_error>
 #include <vector>
 
-//
+// A repository structure to hold the relevant information parsed from the GitHub API response.
 struct Repository {
     std::string owner;
     std::string name;
@@ -18,6 +18,7 @@ struct Repository {
     std::string url;
 };
 
+// A structure to hold the search options parsed from the command line arguments.
 struct SearchOptions {
     std::string query{"stars:>0"};
     std::size_t count{100};
@@ -28,14 +29,16 @@ std::vector<Repository> parse_repositories(const std::string& body);
 void print_repositories(const std::vector<Repository>& repositories);
 bool save_repositories(const std::vector<Repository>& repositories, const std::string& path);
 
+//Alll the cmd line stuff.
 namespace {
-
+    // Print the usage message for the program to the console.
 void print_usage(const char* program)
 {
     std::cerr << "Usage: " << program << " [--query SEARCH_QUERY] [--count 1-100]\n"
               << "Example: " << program << " --query 'stars:>1000' --count 100\n";
 }
 
+// Parse the command line arguments into a SearchOptions structure. Returns true if successful, false if there was an error.
 bool parse_arguments(int argc, char* argv[], SearchOptions& options)
 {
     bool query_supplied = false;

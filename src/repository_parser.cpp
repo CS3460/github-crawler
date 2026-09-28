@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-// A repository structure to hold the relevant information parsed from the GitHub API response.
+// Strucutre for API
 struct Repository {
     std::string owner;
     std::string name;
@@ -18,7 +18,7 @@ struct Repository {
     std::string url;
 };
 
-// Parse a JSON string of repositories from the GitHub API response into a vector of Repository structures.
+// Parse a JSON string of repositories from the GitHub API response into a vector of Repository structures. also what was given to us
 std::vector<Repository> parse_repositories(const std::string& body)
 {
     using json = nlohmann::json;

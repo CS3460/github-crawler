@@ -1,12 +1,10 @@
 #include <httplib.h>
-
 #include <cstdlib>
 #include <iostream>
 #include <string>
 
 namespace {
-
-    // URL-encode a query component for use in a GitHub API request.
+    // URL-encode a query component for use in a GitHub API request. (it throw an error without this)
 std::string encode_query_component(const std::string& value)
 {
     constexpr char hex_digits[] = "0123456789ABCDEF";
