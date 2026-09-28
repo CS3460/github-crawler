@@ -16,6 +16,10 @@
 - Clang / Clang++ (supporting C++20)
 - CMake 3.20+ (we're using `3.28.3`)
 - Git
+- libcpp-httplib-dev 
+- nlohmann-json3-dev 
+- libssl-dev
+- .env file with variable GITHUB_TOKEN
 
 ## Building
 
