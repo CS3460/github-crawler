@@ -15,4 +15,4 @@ cmake --build "$BUILD_DIR" --parallel
 
 echo ""
 echo "=== Build Complete ==="
-echo "Run target with: ./${BUILD_DIR}/github-crawler"
+echo "Run target with: ./${BUILD_DIR}/github_crawler"

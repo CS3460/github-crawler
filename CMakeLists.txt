@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(github-crawler VERSION 0.1.0 LANGUAGES CXX)
+project(github_crawler VERSION 0.1.0 LANGUAGES CXX)
 
 
 # Ubuntu 22.04 LTS has a broken cpp-httplib package, so we need to manually find it if the config file is not found.
@@ -24,14 +24,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(github-crawler 
+add_executable(github_crawler 
             src/main.cpp
             src/github_client.cpp
             src/repository_parser.cpp
             src/repository_store.cpp)
 
-target_compile_features(github-crawler PRIVATE cxx_std_20)
-target_link_libraries(github-crawler PRIVATE
+target_compile_features(github_crawler PRIVATE cxx_std_20)
+target_link_libraries(github_crawler PRIVATE
                     httplib::httplib
                     nlohmann_json::nlohmann_json
 )
