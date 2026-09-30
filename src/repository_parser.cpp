@@ -1,26 +1,12 @@
-#include <nlohmann/json.hpp>
+#include "repository_parser.hpp"
 
-#include <cstdint>
+#include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-// Strucutre for API
-struct Repository
-{
-    std::string owner;
-    std::string name;
-    std::string description;
-    std::uint64_t stars{};
-    std::uint64_t forks{};
-    std::string language;
-    std::uint64_t size{};
-    std::string updated_at;
-    std::string url;
-};
-
-// Parse a JSON string of repositories from the GitHub API response into a vector of Repository structures. also what was given to us
-std::vector<Repository> parse_repositories(const std::string &body)
+// Parse a JSON string of repositories from the GitHub API response into a vector of Repository structures.
+std::vector<Repository> RepositoryParser::parse(const std::string &body)
 {
     using json = nlohmann::json;
     const json root = json::parse(body);

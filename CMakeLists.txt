@@ -28,9 +28,16 @@ add_executable(github_crawler
             src/main.cpp
             src/github_client.cpp
             src/repository_parser.cpp
-            src/repository_store.cpp)
+            src/repository_store.cpp
+            src/repository.hpp
+            src/github_client.hpp
+            src/repository_parser.hpp
+            src/repository_store.hpp)
+
+target_include_directories(github_crawler PRIVATE src)
 
 target_compile_features(github_crawler PRIVATE cxx_std_20)
+target_compile_options(github_crawler PRIVATE -Wall -Wextra -Wpedantic)
 target_link_libraries(github_crawler PRIVATE
                     httplib::httplib
                     nlohmann_json::nlohmann_json
@@ -38,4 +45,3 @@ target_link_libraries(github_crawler PRIVATE
 
 include(CTest)
 enable_testing()
-

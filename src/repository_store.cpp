@@ -1,23 +1,10 @@
+#include "repository_store.hpp"
+
 #include <nlohmann/json.hpp>
-#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
-
-// This stuipid strucuture is duplicated in multiple files, we could refactor it into a header file but the project doens't list it so -\(_-_-)_/-
-struct Repository
-{
-    std::string owner;
-    std::string name;
-    std::string description;
-    std::uint64_t stars{};
-    std::uint64_t forks{};
-    std::string language;
-    std::uint64_t size{};
-    std::string updated_at;
-    std::string url;
-};
 
 // Print a vector of Repository structures to the console in a nice format.
 void print_repositories(const std::vector<Repository> &repositories)
@@ -37,7 +24,7 @@ void print_repositories(const std::vector<Repository> &repositories)
     }
 }
 
-// Save a vector of Repository structures to a JSON file at the specified path. So we don't have to parse again.
+// Save a collection of repositories to a JSON file at the specified path.
 bool save_repositories(const std::vector<Repository> &repositories, const std::string &path)
 {
     nlohmann::json output = nlohmann::json::array();

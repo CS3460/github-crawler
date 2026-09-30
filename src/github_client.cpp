@@ -1,11 +1,14 @@
+#include "github_client.hpp"
+
 #include <httplib.h>
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <utility>
 
 namespace
 {
-    // URL-encode a query component for use in a GitHub API request. (it throw an error without this)
+    // URL-encode a query component for use in a GitHub API request.
     std::string encode_query_component(const std::string &value)
     {
         constexpr char hex_digits[] = "0123456789ABCDEF";
@@ -36,10 +39,19 @@ namespace
 
 }
 
-// Fetch a JSON string of repositories from the GitHub API using the given search query and count.
-std::string fetch_repository_json(const std::string &query, std::size_t count)
+GitHubClient::GitHubClient(std::string base_url)
+    : base_url_(std::move(base_url))
 {
-    httplib::Client client("https://api.github.com");
+}
+
+std::string GitHubClient::fetch_repositories_json(const SearchOptions &options) const
+{
+    return fetch_repositories_json(options.query, options.count);
+}
+
+std::string GitHubClient::fetch_repositories_json(const std::string &query, std::size_t count) const
+{
+    httplib::Client client(base_url_);
     client.set_connection_timeout(10, 0);
     client.set_read_timeout(30, 0);
 
