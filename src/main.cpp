@@ -29,54 +29,79 @@ std::vector<Repository> parse_repositories(const std::string& body);
 void print_repositories(const std::vector<Repository>& repositories);
 bool save_repositories(const std::vector<Repository>& repositories, const std::string& path);
 
-//Alll the cmd line stuff.
+//All the cmd line stuff.
 namespace {
-    // Print the usage message for the program to the console.
+
+enum class ParseResult {
+    Success,
+    HelpRequested,
+    Error
+};
+
+// Print the usage message for the program to the console.
 void print_usage(const char* program)
 {
-    std::cerr << "Usage: " << program << " [--query SEARCH_QUERY] [--count 1-100]\n"
-              << "Example: " << program << " --query 'stars:>1000' --count 100\n";
+    std::cout << "Usage: " << program << " [OPTIONS] [SEARCH_QUERY]\n\n"
+              << "Arguments:\n"
+              << "  [SEARCH_QUERY]             GitHub search query (default: 'stars:>0')\n\n"
+              << "Options:\n"
+              << "  -q, --query <SEARCH_QUERY> GitHub search query\n"
+              << "  -c, --count <1-100>        Number of repositories to collect (default: 100)\n"
+              << "  -h, --help                 Show this help message and exit\n\n"
+              << "Examples:\n"
+              << "  " << program << " \"stars:>1000\"\n"
+              << "  " << program << " -q \"stars:>1000\" --count 50\n"
+              << "  " << program << " --query \"language:cpp stars:>500\" -c 100\n";
 }
 
-// Parse the command line arguments into a SearchOptions structure. Returns true if successful, false if there was an error.
-bool parse_arguments(int argc, char* argv[], SearchOptions& options)
+// Parse the command line arguments into a SearchOptions structure.
+ParseResult parse_arguments(int argc, char* argv[], SearchOptions& options)
 {
     bool query_supplied = false;
     for (int index = 1; index < argc; ++index) {
         const std::string argument = argv[index];
         if (argument == "--help" || argument == "-h") {
             print_usage(argv[0]);
-            return false;
+            return ParseResult::HelpRequested;
         }
-        if (argument == "--query" && index + 1 < argc) {
+        if ((argument == "--query" || argument == "-q") && index + 1 < argc) {
+            if (query_supplied) {
+                std::cerr << "Search query was specified multiple times.\n";
+                print_usage(argv[0]);
+                return ParseResult::Error;
+            }
             options.query = argv[++index];
             query_supplied = true;
-        } else if (argument == "--count" && index + 1 < argc) {
+        } else if ((argument == "--count" || argument == "-c") && index + 1 < argc) {
             const std::string value = argv[++index];
             std::size_t count = 0;
             const auto parsed = std::from_chars(value.data(), value.data() + value.size(), count);
             if (parsed.ec != std::errc{} || parsed.ptr != value.data() + value.size() ||
                 count == 0 || count > 100) {
                 std::cerr << "Count must be an integer from 1 to 100.\n";
-                return false;
+                return ParseResult::Error;
             }
             options.count = count;
-        } else {
+        } else if (argument.starts_with("-")) {
             std::cerr << "Unknown or incomplete argument: " << argument << '\n';
             print_usage(argv[0]);
-            return false;
+            return ParseResult::Error;
+        } else {
+            if (query_supplied) {
+                std::cerr << "Unexpected extra positional argument: " << argument << '\n';
+                print_usage(argv[0]);
+                return ParseResult::Error;
+            }
+            options.query = argument;
+            query_supplied = true;
         }
     }
 
     if (options.query.empty()) {
         std::cerr << "Search query cannot be empty.\n";
-        return false;
+        return ParseResult::Error;
     }
-    if (query_supplied && options.query.front() == '-') {
-        std::cerr << "Search query must not be empty.\n";
-        return false;
-    }
-    return true;
+    return ParseResult::Success;
 }
 
 }
@@ -84,7 +109,11 @@ bool parse_arguments(int argc, char* argv[], SearchOptions& options)
 int main(int argc, char* argv[])
 {
     SearchOptions options;
-    if (!parse_arguments(argc, argv, options)) {
+    const ParseResult parse_result = parse_arguments(argc, argv, options);
+    if (parse_result == ParseResult::HelpRequested) {
+        return 0;
+    }
+    if (parse_result == ParseResult::Error) {
         return 2;
     }
 
