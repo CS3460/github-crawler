@@ -24,3 +24,15 @@ struct SearchOptions
     std::string query{"stars:>0"};
     std::size_t count{100};
 };
+
+// Represents options for analyzing a repository dataset in Milestone 2.
+struct AnalysisOptions
+{
+    std::string dataset_path{"repositories.json"};
+    std::uint64_t min_stars{0};
+    std::string language;          // empty indicates any language
+    std::string sort_key{"stars"}; // "stars", "forks", or "updated"
+    std::size_t top_n{10};
+    std::string export_path{"selected.json"};
+    std::string export_format{"json"}; // "json" or "csv"
+};
