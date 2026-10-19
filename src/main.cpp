@@ -1,4 +1,8 @@
+#include "analyzer.hpp"
+#include "data_loader.hpp"
+#include "exporter.hpp"
 #include "github_client.hpp"
+#include "reporter.hpp"
 #include "repository.hpp"
 #include "repository_parser.hpp"
 #include "repository_store.hpp"
@@ -232,14 +236,45 @@ int main(int argc, char *argv[])
         return run_crawl_mode(options.crawl_options);
     }
 
-    std::cout << "Analysis Configuration:\n"
-              << "  Dataset: " << options.analysis_options.dataset_path << '\n'
-              << "  Min stars: " << options.analysis_options.min_stars << '\n'
-              << "  Language: " << (options.analysis_options.language.empty() ? "any" : options.analysis_options.language) << '\n'
-              << "  Sort key: " << options.analysis_options.sort_key << '\n'
-              << "  Top N: " << options.analysis_options.top_n << '\n'
-              << "  Export path: " << options.analysis_options.export_path << '\n'
-              << "  Export format: " << options.analysis_options.export_format << '\n';
+    // 1. Local dataset loading
+    std::vector<Repository> repositories;
+    try
+    {
+        repositories = DataLoader::load_repositories(options.analysis_options.dataset_path);
+    }
+    catch (const std::exception &error)
+    {
+        std::cerr << "Failed to load repository dataset: " << error.what() << '\n';
+        return 1;
+    }
+
+    // 2. Repository analysis: Filter -> Sort -> Top N
+    std::vector<Repository> selected;
+    try
+    {
+        selected = analyze_repositories(repositories, options.analysis_options);
+    }
+    catch (const std::exception &error)
+    {
+        std::cerr << "Analysis failed: " << error.what() << '\n';
+        return 1;
+    }
+
+    // 3. Analysis output: Terminal report
+    Reporter::print_report(selected, repositories.size(), options.analysis_options);
+
+    // 4. Analysis output: Export to JSON or CSV
+    if (!options.analysis_options.export_path.empty())
+    {
+        if (!Exporter::export_repositories(selected,
+                                           options.analysis_options.export_path,
+                                           options.analysis_options.export_format))
+        {
+            std::cerr << "Failed to export selected repositories to "
+                      << options.analysis_options.export_path << '\n';
+            return 1;
+        }
+    }
 
     return 0;
 }
