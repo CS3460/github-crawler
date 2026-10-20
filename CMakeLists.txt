@@ -29,10 +29,18 @@ add_executable(github_crawler
             src/github_client.cpp
             src/repository_parser.cpp
             src/repository_store.cpp
+            src/data_loader.cpp
+            src/analyzer.cpp
+            src/reporter.cpp
+            src/exporter.cpp
             src/repository.hpp
             src/github_client.hpp
             src/repository_parser.hpp
-            src/repository_store.hpp)
+            src/repository_store.hpp
+            src/data_loader.hpp
+            src/analyzer.hpp
+            src/reporter.hpp
+            src/exporter.hpp)
 
 target_include_directories(github_crawler PRIVATE src)
 
@@ -45,3 +53,42 @@ target_link_libraries(github_crawler PRIVATE
 
 include(CTest)
 enable_testing()
+
+add_executable(test_data_loader
+    tests/test_data_loader.cpp
+    src/data_loader.cpp
+    src/repository.hpp
+    src/data_loader.hpp
+)
+target_include_directories(test_data_loader PRIVATE src)
+target_compile_features(test_data_loader PRIVATE cxx_std_20)
+target_compile_options(test_data_loader PRIVATE -Wall -Wextra -Wpedantic)
+target_link_libraries(test_data_loader PRIVATE
+    nlohmann_json::nlohmann_json
+)
+add_test(NAME test_data_loader COMMAND test_data_loader)
+
+add_executable(test_analyzer
+    tests/test_analyzer.cpp
+    src/analyzer.cpp
+    src/repository.hpp
+    src/analyzer.hpp
+)
+target_include_directories(test_analyzer PRIVATE src)
+target_compile_features(test_analyzer PRIVATE cxx_std_20)
+target_compile_options(test_analyzer PRIVATE -Wall -Wextra -Wpedantic)
+add_test(NAME test_analyzer COMMAND test_analyzer)
+
+add_executable(test_exporter
+    tests/test_exporter.cpp
+    src/exporter.cpp
+    src/repository.hpp
+    src/exporter.hpp
+)
+target_include_directories(test_exporter PRIVATE src)
+target_compile_features(test_exporter PRIVATE cxx_std_20)
+target_compile_options(test_exporter PRIVATE -Wall -Wextra -Wpedantic)
+target_link_libraries(test_exporter PRIVATE
+    nlohmann_json::nlohmann_json
+)
+add_test(NAME test_exporter COMMAND test_exporter)

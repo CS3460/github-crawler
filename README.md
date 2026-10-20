@@ -49,3 +49,5 @@ Run instructions will be provided at the end of the `build.sh` output, but by de
 ```bash
 ./build/github_crawler
 ```
+
+Run `./build/github_crawler -h` for a list of arguments to get started.
